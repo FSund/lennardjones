@@ -12,6 +12,7 @@ using namespace arma;
 class Integrator
 {
 public:
+    Integrator();
     Integrator(State* state);
     void stepForward(double &dt);
 

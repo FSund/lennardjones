@@ -2,7 +2,7 @@
 
 State::State()
 {
-    cout << "State::State() -- Using default constructor!" << endl;
+    cout << "! State default constructor !" << endl;
 }
 
 State::State(
@@ -11,10 +11,10 @@ State::State(
         double interactionLength):
     atoms(atomVec),
     nAtoms(atomVec.size()),
-    size(systemSize),
-    interactionLength(interactionLength)
+    size(systemSize)
 {
-    createBoxes();
+    cout << "State custom constructor" << endl;
+    createBoxes(interactionLength);
     sortAtoms();
 }
 
@@ -30,7 +30,7 @@ State::State(
 //    }
 //}
 
-void State::createBoxes()
+void State::createBoxes(double interactionLength)
 {
     for (uint i = 0; i < 3; i++)
         nBoxesVec(i) = floor(size(i)/interactionLength);
@@ -86,6 +86,8 @@ void State::sortAtoms()
 
 void State::putAtomInCorrectBox(Atom *atom)
 {
+//    cout << "State::putAtomInCorrectBox" << endl;
+
     vec3 atomPos = atom->getPosition();
     uvec3 boxIndex;
     for (uint j = 0; j < 3; j++)
@@ -96,10 +98,21 @@ void State::putAtomInCorrectBox(Atom *atom)
 
 void State::updateForces()
 {
-    boundaryControl();
+//    cout << "State::updateForces()" << endl;
+
+    boundaryControl(); // PBC
+
+//    ////
+//    for (Atom* atom : atoms)
+//        for (uint i = 0; i < 3; i++)
+//            if (atom->getPosition()(i) < 0 || atom->getPosition()(i) > size(i))
+//                cout << "! OUT OF BOUNDS !" << endl;
+//    ////
 
     // checking if any atoms have moved outside their boxes
     linkedList<Atom*> purgedAtoms;
+    // "purgedAtoms" will have a random Atom* as "item", but since next == 0,
+    // this won't cause any trouble
     for (Box* box : boxes)
     {
         box->purgeAtoms(purgedAtoms);
@@ -115,6 +128,19 @@ void State::updateForces()
         purgedAtoms = *purgedAtoms.next;
     }
 
+//    ////
+//    cout << "After" << endl;
+//    for (Atom* atom : atoms)
+//    {
+//        cout << atom->getPosition().t();
+//        cout << atom->getVelocity().t();
+//        cout << atom->getForce().t();
+//    }
+//    cout << endl;
+//    for (Box* box : boxes)
+//        cout << "Atoms in box #" << sub2ind3d(box->index, nBoxesVec) << " = " << box->nAtoms << endl;
+//    ////
+
     // calculating the forces between the atoms
     for (Box* box : boxes)
     {
@@ -124,24 +150,55 @@ void State::updateForces()
     {
         box->calculateForces();
     }
+
+//    cout << "Exiting State::updateForces()" << endl;
 }
 
 void State::boundaryControl()
 {
     vec3 pos;
+    bool moved;
     for (Atom* atom : atoms)
     {
+        moved = false;
         pos = atom->getPosition();
         for (uint i = 0; i < 3; i++)
         {
-            pos(i) -= floor(pos(i)/size(i))*size(i);
+            if (pos(i) < 0.0 || pos(i) >= size(i))
+            {
+                pos(i) -= floor(pos(i)/size(i))*size(i);
+                moved = true;
+            }
+        }
+        if (moved)
+        {
+            atom->setPosition(pos);
         }
     }
 }
 
-Atom *State::getAtom(uint idx)
-{
-    cout << "nAtoms = " << nAtoms << endl;
-    cout << "nAtoms2 = " << atoms.size() << endl;
-    return atoms[idx];
-}
+//void State::testForces()
+//{
+//    const uint atomNr = 12;
+//    const vec3 rvec = atoms[atomNr]->getPosition();
+
+//    vec3 force = zeros<vec>(3);
+//    vec3 drvec;
+//    double dr2, dr6, scalarForce;
+
+//    for (uint i = 0; i < nAtoms; i++)
+//    {
+//        if (i == atomNr) continue;
+
+//        drvec = rvec - atoms[i]->getPosition();
+
+//        // minimum image convention
+//        for (uint j = 0; j < 3; j++)
+//            if (drvec(j) > size(j)/2.0)
+//                drvec(j) = drvec(j)/2.0;
+
+//        force += norm(drvec, 2)*drvec;
+//    }
+
+//    cout << "total 'force'' on atom #" << atomNr << " = " << force.t() << endl;
+//}

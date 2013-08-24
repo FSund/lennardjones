@@ -15,6 +15,7 @@ using namespace arma;
 class Box
 {
 public:
+    Box();
     Box(vec3 boxPos, vec3 boxSize, uvec3 boxIndex, uvec3 nBoxesVec);
     void findNeighbours(const vec3 systemSize, const vector<Box *> boxes);
     void addAtom(Atom *atom);
@@ -22,12 +23,13 @@ public:
     void flush();
 
     void calculateForces();
-    const vec3 forceFromBox(const vec3 &rvec, const bool &isMatrixAtom);
-    inline const bool &forcesAreCalculated() const;
-
     inline void resetForcesBool();
 
 protected:
+    const vec3 calculateForceFromBox(const vec3 &rvec, const bool &isMatrixAtom);
+    const vec3 calculateForceFromSelf(const linkedList<Atom *> *runner);
+    inline const bool &forcesAreCalculated() const;
+
     vec3 pos;
     vec3 size; // in state?
     uvec3 index;

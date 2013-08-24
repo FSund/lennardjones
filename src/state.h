@@ -3,6 +3,7 @@
 
 // forward declarations
 class Integrator;
+class Generator;
 
 #include <armadillo>
 
@@ -16,20 +17,25 @@ using namespace arma;
 class State
 {
 friend class Integrator;
+friend class Generator;
 
 public:
     State();
     State(vector<Atom*> atomVec, vec3 systemSize, double interactionLength);
 //    ~State();
-    void createBoxes();
+    void createBoxes(double interactionLength);
     void sortAtoms();
     void putAtomInCorrectBox(Atom *atom);
     void addAtom(Atom* atom);
 
     void updateForces();
     void boundaryControl();
+//    void testForces();
 
-    Atom *getAtom(uint idx);
+    inline const uint &getnAtoms() const;
+    inline const Atom *readAtom(uint idx) const;
+
+//    inline const vector<const Atom *> getAtoms() const;
 
 protected:
     vector<Atom*> atoms;
@@ -40,7 +46,28 @@ protected:
     vec3 size;
     vec3 boxSize;
     uvec3 nBoxesVec;
-    double interactionLength;
 };
+
+inline const uint &State::getnAtoms() const
+{
+    return nAtoms;
+}
+
+inline const Atom *State::readAtom(uint idx) const
+{
+    return atoms[idx];
+}
+
+//inline const vector<const Atom*> State::getAtoms() const
+//{
+//    vector<const Atom*> constAtoms;
+//    constAtoms.reserve(nAtoms);
+//    for (Atom* atom : atoms)
+//    {
+//        const Atom* constAtom = atom;
+//        constAtoms.push_back(constAtom);
+//    }
+//    return constAtoms;
+//}
 
 #endif // STATE_H

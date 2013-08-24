@@ -21,6 +21,7 @@ using namespace arma;
 class Atom
 {
 public:
+    Atom();
     Atom(
             const string &atomType,
             const vec3 &position,
@@ -31,7 +32,7 @@ public:
     inline const vec3 &getPosition() const;
     inline const vec3 &getVelocity() const;
     inline const vec3 &getForce() const;
-    inline void getData(vec3 &position_, vec3 &velocity_, vec3 &force_) const;
+//    inline void getData(vec3 &position_, vec3 &velocity_, vec3 &force_) const;
 
 //    double getPotEn() const;
 //    double getPressure() const;
@@ -79,12 +80,12 @@ inline const vec3 &Atom::getForce() const
     return force;
 }
 
-inline void Atom::getData(vec3 &position_, vec3 &velocity_, vec3 &force_) const
-{
-    position_ = position;
-    velocity_ = velocity;
-    force_ = force;
-}
+//inline void Atom::getData(vec3 &position_, vec3 &velocity_, vec3 &force_) const
+//{
+//    position_ = position;
+//    velocity_ = velocity;
+//    force_ = force;
+//}
 
 inline void Atom::addToForce(const vec3 &addForce)
 {

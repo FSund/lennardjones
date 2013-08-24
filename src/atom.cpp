@@ -1,5 +1,10 @@
 #include "atom.h"
 
+Atom::Atom()
+{
+    cout << "! Atom default constructor !" << endl;
+}
+
 Atom::Atom(
         const string &atomType_,
         const vec3 &position,
@@ -14,6 +19,7 @@ Atom::Atom(
     matrixAtom(0),
     atomType(atomType_)
 {
+//    cout << "Atom custom constructor" << endl;
     setAtomType(atomType_);
 }
 

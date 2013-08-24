@@ -2,6 +2,7 @@
 
 Generator::Generator()
 {
+    cout << "Generator default constructor." << endl;
 }
 
 State Generator::createCrystal(
@@ -49,8 +50,6 @@ State Generator::createCrystal(
                     atomPos = cellPos + latticePoints.col(i);
                     Atom* atom = new Atom("Ar", atomPos);
                     atoms.push_back(atom);
-
-                    cout << "atom position = " << atom->getPosition().t() << endl;
                 }
             }
         }
@@ -60,3 +59,100 @@ State Generator::createCrystal(
     State state(atoms, systemSize, interactionLength);
     return state;
 }
+
+void Generator::setTemperature(State* state, const double &temperature, long* idum)
+{
+    uint nAtoms = state->getnAtoms();
+    mat velocities(3, nAtoms);
+    // generating random, uniform velocities
+    for (uint i = 0 ; i < nAtoms; i++)
+    {
+        for (uint j = 0; j < 3; j++)
+        {
+            velocities(j,i) = (ran2(idum) - 0.5)*temperature;
+        }
+    }
+    // removing any linear momentum from the system
+    vec3 momentum = sum(velocities, 1)/double(nAtoms);
+    for(uint i = 0; i < nAtoms; i++)
+    {
+        velocities.col(i) -= momentum;
+    }
+
+    // sending the velocities to the atoms
+    for (uint i = 0; i < nAtoms; i++)
+    {
+        state->atoms[i]->setVelocity(velocities.col(i));
+    }
+}
+
+void Generator::saveState(State *state, const string &filename)
+{
+//    cout << "Generator::saveState" << endl;
+
+    // // check and fix the extension of the filename
+    // if (filename.substr(filename.find_last_of(".")) != ".xyz")
+    // {
+    //     filename.append(".xyz");
+    // }
+
+    bool indexing = true;
+    bool saveForces = true;
+
+    // open file stream
+    ofstream ofile;
+    ofile.open(filename.c_str());
+
+    // check if we managed to open the file on disk
+    if (!ofile)
+    {
+        cout << endl;
+        cout << "! It seems like the '.xyz'-file couldn't be created. ";
+        cout << "No .xyz-files will be saved. Please fix the folder or filename ";
+        cout << "and rerun if you want to save the states." << endl;
+        return;
+    }
+
+    uint nAtoms = state->getnAtoms();
+    const Atom* atom;
+    vec3 pos, vel, force;
+
+    ofile << nAtoms << endl;
+    ofile << "Comment" << endl;
+    for (uint i = 0; i < nAtoms; i++)
+    {
+        atom = state->readAtom(i);
+        ofile << atom->getAtomType();
+        //ofile << scientific; // uncomment if you want "0.000000e+00" formatting
+        ofile << setw(16) << setprecision(8);
+
+        pos = atom->getPosition();
+        for (uint j = 0; j < 3; j++)
+        {
+            ofile << setw(18) << setprecision(8) << pos(j);
+        }
+        vel = atom->getVelocity();
+        for (uint j = 0; j < 3; j++)
+        {
+            ofile << setw(16) << setprecision(8) << vel(j);
+        }
+        if (saveForces)
+        {
+            force = atom->getForce();
+            for (uint j = 0; j < 3; j++)
+            {
+                ofile << setw(16) << setprecision(8) << force(j);
+            }
+            ofile << setw(16) << setprecision(8) << norm(force, 2);
+        }
+        if (indexing)
+        {
+            ofile << setw(16) << setprecision(8) << i+1;
+        }
+        ofile << endl;
+    }
+    ofile.close();
+
+//    cout << "Exiting Generator::saveState" << endl;
+}
+
