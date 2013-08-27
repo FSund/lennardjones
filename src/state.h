@@ -31,6 +31,7 @@ public:
     State();
     State(vector<Atom*> atomVec, vec3 systemSize, double interactionLength);
 //    ~State();
+    void printInfo();
     void createBoxes(double interactionLength);
     void sortAtoms();
     void putAtomInCorrectBox(Atom *atom);

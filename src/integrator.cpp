@@ -8,7 +8,7 @@ Integrator::Integrator()
 Integrator::Integrator(State *state):
     state(state)
 {
-    cout << "Integrator custom constructor" << endl;
+//    cout << "Integrator custom constructor" << endl;
 }
 
 void Integrator::stepForward(double &dt)

@@ -2,7 +2,7 @@
 
 Generator::Generator()
 {
-    cout << "Generator default constructor." << endl;
+//    cout << "Generator default constructor." << endl;
 }
 
 State Generator::createCrystal(
@@ -27,7 +27,7 @@ State Generator::createCrystal(
 
         break;
     default:
-        cout << "Unknown structure, exiting now!" << endl;
+        cout << "! Unknown structure, exiting now !" << endl;
         exit(1);
     }
 
@@ -120,10 +120,7 @@ void Generator::saveState(State *state, const string &filename)
     // check if we managed to open the file on disk
     if (!ofile)
     {
-        cout << endl;
-        cout << "! It seems like the '.xyz'-file couldn't be created. ";
-        cout << "No .xyz-files will be saved. Please fix the folder or filename ";
-        cout << "and rerun if you want to save the states." << endl;
+        cout << "! It seems like the '.xyz'-file couldn't be created. No .xyz-files will be saved. Please fix the folder or filename and rerun if you want to save the states." << endl;
         return;
     }
 
@@ -182,10 +179,7 @@ void Generator::saveStateBox(State *state, const string &filename)
     // check if we managed to open the file on disk
     if (!ofile)
     {
-        cout << endl;
-        cout << "! It seems like the '.xyz'-file couldn't be created. ";
-        cout << "No .xyz-files will be saved. Please fix the folder or filename ";
-        cout << "and rerun if you want to save the states." << endl;
+        cout << "! It seems like the '.xyz'-file couldn't be created. No .xyz-files will be saved. Please fix the folder or filename and rerun if you want to save the states." << endl;
         return;
     }
 

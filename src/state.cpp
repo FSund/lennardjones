@@ -13,9 +13,23 @@ State::State(
     nAtoms(atomVec.size()),
     size(systemSize)
 {
-    cout << "State custom constructor" << endl;
+//    cout << "State custom constructor" << endl;
     createBoxes(interactionLength);
     sortAtoms();
+}
+
+void State::printInfo()
+{
+    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
+    cout << "| System info" << endl;
+    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
+    cout << "| nAtoms = " << nAtoms << endl;
+    cout << "| Size of boxes  (MD): " << boxSize.t()
+         << "|                (SI): " << boxSize.t()*L0
+         << "| Size of system (MD): " << size.t()
+         << "|                (SI): " << size.t()*L0
+         << "| Number of boxes    : " << nBoxesVec.t();
+    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
 }
 
 //State::~State()
@@ -63,17 +77,6 @@ void State::createBoxes(double interactionLength)
     // finding all the neighbouring boxes of each box
     for (uint i = 0; i < nBoxes; i++)
         boxes[i]->findNeighbours(size, boxes);
-
-    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
-    cout << "| System info" << endl;
-    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
-    cout << "| nAtoms = " << nAtoms << endl;
-    cout << "| Size of boxes  (MD): " << boxSize.t()
-         << "|                (SI): " << boxSize.t()*L0
-         << "| Size of system (MD): " << size.t()
-         << "|                (SI): " << size.t()*L0
-         << "| Number of boxes    : " << nBoxesVec.t();
-    cout << "| — — — — — — — — — — — — — — — — — — — — — — — — — — — " << endl;
 }
 
 void State::sortAtoms()
