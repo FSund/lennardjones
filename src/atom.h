@@ -40,9 +40,10 @@ public:
 
     void setPosition(const vec3 &position_);
     void setVelocity(const vec3 &velocity_);
-    void setForce(const vec3 &newForce);
+    void setForce(const vec3 &force_);
 
     inline void addToForce(const vec3 &addForce);
+    inline void resetForce();
 //    inline void addToBoundaryCrossings(ivec3 &addBoundaryCrossings);
 //    inline void addToStatistics(double &addPot, double &addPressure);
 
@@ -92,6 +93,13 @@ inline void Atom::addToForce(const vec3 &addForce)
     force(0) += addForce(0);
     force(1) += addForce(1);
     force(2) += addForce(2);
+}
+
+inline void Atom::resetForce()
+{
+    force(0) = 0.0;
+    force(1) = 0.0;
+    force(2) = 0.0;
 }
 
 //inline void Atom::addToStatistics(double &addPot, double &addPressure)

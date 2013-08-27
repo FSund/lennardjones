@@ -20,10 +20,15 @@ public:
             vec3 unitCellSize,
             double interactionLength);
 
-    void setTemperature(State* state, const double &temperature, long *idum);
+    void setTemperature(
+            State* state,
+            const double &temperature,
+            long *idum,
+            uint distribution);
 
     State load(string filename);
     void saveState(State* state, const string &filename);
+    void saveStateBox(State* state, const string &filename);
 protected:
 
 };

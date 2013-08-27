@@ -1,6 +1,9 @@
 #ifndef BOX_H
 #define BOX_H
 
+// forward declarations
+class Generator;
+
 #include <vector>
 
 #include <armadillo>
@@ -14,6 +17,8 @@ using namespace arma;
 
 class Box
 {
+friend class Generator;
+
 public:
     Box();
     Box(vec3 boxPos, vec3 boxSize, uvec3 boxIndex, uvec3 nBoxesVec);

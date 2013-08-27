@@ -5,6 +5,10 @@
 class Integrator;
 class Generator;
 
+////
+class MainApplication;
+////
+
 #include <armadillo>
 
 #include <src/atom.h>
@@ -18,6 +22,10 @@ class State
 {
 friend class Integrator;
 friend class Generator;
+
+////
+friend class MainApplication;
+////
 
 public:
     State();

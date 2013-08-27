@@ -284,3 +284,10 @@ double ran3(long *idum)
 #undef FAC
 
 // End: function ran3()
+
+
+//double randn(long *idum)
+//{
+//    // Box-Muller transform
+//    return sqrt(-2.0*log(ran2(idum))) * cos(2.0*M_PI*ran2(idum));
+//}

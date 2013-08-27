@@ -13,3 +13,4 @@ double ran0(long *);
 double ran1(long *);
 double ran2(long *);
 double ran3(long *);
+//double randn(long *idum);

@@ -53,6 +53,11 @@ void Atom::setVelocity(const vec3 &velocity_)
     velocity = velocity_;
 }
 
+void Atom::setForce(const vec3 &force_)
+{
+    force = force_;
+}
+
 void Atom::setAtomType(const string &atomType_)
 {
     if (atomType_ == "Ar")
