@@ -27,10 +27,16 @@ public:
             uint distribution);
 
     State load(string filename);
+
+    void randomSphericalPores(
+            State* state,
+            uint nPores,
+            double poreRadiusMean,
+            double poreRadiusStddv);
+    void invertMatrix(State* state);
+
     void saveState(State* state, const string &filename);
     void saveStateBox(State* state, const string &filename);
-protected:
-
 };
 
 #endif // GENERATOR_H

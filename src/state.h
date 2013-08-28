@@ -5,10 +5,6 @@
 class Integrator;
 class Generator;
 
-////
-class MainApplication;
-////
-
 #include <armadillo>
 
 #include <src/atom.h>
@@ -22,10 +18,6 @@ class State
 {
 friend class Integrator;
 friend class Generator;
-
-////
-friend class MainApplication;
-////
 
 public:
     State();
@@ -50,7 +42,6 @@ protected:
     vector<Atom*> atoms;
     vector<Box*> boxes;
     uint nAtoms;
-    uint nMovingAtoms;
     uint nBoxes;
     vec3 size;
     vec3 boxSize;

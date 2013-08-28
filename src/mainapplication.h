@@ -15,6 +15,7 @@ class MainApplication
 public:
     MainApplication();
     int run(int argc, char *argv[]);
+    int benchmark(int argc, char *argv[]);
 };
 
 #endif // MAINAPPLICATION_H
