@@ -111,7 +111,7 @@ void State::updateForces()
     boundaryControl(); // PBC
 
     // checking if any atoms have moved outside their boxes
-    linkedList<Atom*> purgedAtoms;
+    vector<Atom*> purgedAtoms;
     // "purgedAtoms" will have a random Atom* as "item", but since next == 0,
     // this won't cause any trouble
     for (Box* box : boxes)
@@ -120,13 +120,9 @@ void State::updateForces()
     }
 
     // putting boxless atoms into their correct boxes
-    Atom* atom;
-    while (purgedAtoms.readNext() != 0)
+    for (auto it = purgedAtoms.begin(); it != purgedAtoms.end(); ++it)
     {
-        atom = purgedAtoms.readItem();
-        putAtomInCorrectBox(atom);
-
-        purgedAtoms = *purgedAtoms.next;
+        putAtomInCorrectBox(*it);
     }
 
     // resetting stuff

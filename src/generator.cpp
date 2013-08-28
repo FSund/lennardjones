@@ -58,6 +58,7 @@ State Generator::createCrystal(
 
     vec3 systemSize = nUnitCellsVec%unitCellSize;
     State state(atoms, systemSize, interactionLength);
+
     return state;
 }
 
@@ -194,10 +195,9 @@ void Generator::saveStateBox(State *state, const string &filename)
     uint i = 0;
     for (Box* box : state->boxes)
     {
-        runner = &box->atomList;
-        while (runner->readNext() != 0)
+        for (auto it = box->atomList.begin(); it != box->atomList.end(); ++it)
         {
-            atom = runner->readItem();
+            atom = *it;
             ofile << atom->getAtomType();
             //ofile << scientific; // uncomment if you want "0.000000e+00" formatting
             ofile << setw(16) << setprecision(8);

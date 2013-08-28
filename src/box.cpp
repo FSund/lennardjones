@@ -84,38 +84,22 @@ void Box::findNeighbours(const vec3 systemSize, const vector<Box*> boxes)
             }
         }
     }
-
-//    ////
-//    cout << displacementVectors << endl;
-//    cout << "We found " << nNeighbours << "/" << neighbours.size() << " neighbours." << endl;
-//    cout << endl;
-//    cout << "the neighbours of box #" << sub2ind3d(index, nBoxesVec) << " are " << endl;
-//    for (Box* box : neighbours)
-//        cout << sub2ind3d(box->index, nBoxesVec) << endl;
-//    cout << endl;
-//    ////
 }
 
 void Box::addAtom(Atom* atom)
 {
-    atomList.insertFirstItem(atom);
-    nAtoms++;
+    atomList.push_back(atom);
 }
 
-void Box::purgeAtoms(linkedList<Atom*> &purgedAtoms)
+void Box::purgeAtoms(vector<Atom*> &purgedAtoms)
 {
-    /* Runs through the linked list of atoms and checks which (if any) atoms
-     * have moved outside the box. Those atoms are removed from the list, and
-     * added to the list "purgedAtoms", which is returned */
-
-    linkedList<Atom*>* runner = &atomList; // this will edit the atomlist directly
     vec3 atomPos;
 
-    // running through the list
-    while (runner->readNext() != 0)
+    // loop over all atoms in atomList
+    auto it = atomList.begin();
+    while (it != atomList.end())
     {
-        atomPos = runner->readItem()->getPosition();
-        // checking if the atom is outside the box
+        atomPos = (*it)->getPosition();
         if (
                 atomPos(0) <  pos(0) ||
                 atomPos(1) <  pos(1) ||
@@ -123,18 +107,15 @@ void Box::purgeAtoms(linkedList<Atom*> &purgedAtoms)
                 atomPos(0) >= pos(0) + size(0) ||
                 atomPos(1) >= pos(1) + size(1) ||
                 atomPos(2) >= pos(2) + size(2)
-            )
+                )
         {
-            // dropping the atom from the list
-            purgedAtoms.insertFirstItem(runner->item);
-            runner->dropFirstItem();
-            nAtoms--;
-
-            // don't want to advance to the next item in the list, since we just
-            // removed an item from the list
-            continue;
+            purgedAtoms.push_back(*it);
+            it = atomList.erase(it); // reseat iterator to a valid value post-erase
         }
-        runner = runner->next;
+        else
+        {
+            ++it;
+        }
     }
 }
 
@@ -144,22 +125,20 @@ void Box::flush()
      * The box only has a linked list of pointers to atoms, so we only need to
      * reset this list, and reset the # of atoms to do this */
 
-    atomList.next = 0;
-    atomList.item = 0;
-    nAtoms = 0;
+    atomList.clear();
 }
 
 void Box::calculateForces()
 {
     vec3 forceOnAtom, atomPos, rvec, forceFromBox;
     Box* box;
-    const linkedList<Atom*>* runner = &atomList; // pointer to constant linkedList<Atom*>, NOT constant pointer
     bool isMatrixAtom;
+    auto end = atomList.end();
 
-    while (runner->readNext() != 0)
+    for (auto it = atomList.begin(); it != end; ++it)
     {
-        atomPos = runner->readItem()->getPosition();
-        isMatrixAtom = runner->readItem()->isMatrixAtom();
+        atomPos = (*it)->getPosition();
+        isMatrixAtom = (*it)->isMatrixAtom();
         forceOnAtom = zeros<vec>(3);
 
         // forces from all neighbouring boxes
@@ -183,13 +162,10 @@ void Box::calculateForces()
             forceOnAtom(2) += forceFromBox(2);
         }
         // force from all atoms in this box
-        forceOnAtom += calculateForceFromSelf(runner);
+        forceOnAtom += calculateForceFromSelf(it, end);
 
         // adding the force from the neighbouring boxes on this atom, to the atom
-        runner->readItem()->addToForce(forceOnAtom);
-
-        // advancing to the next atom
-        runner = runner->readNext();
+        (*it)->addToForce(forceOnAtom);
     }
 
     // since we use N2L when calculating the forces from the neighbouring boxes,
@@ -204,18 +180,11 @@ const vec3 Box::calculateForceFromBox(const vec3 &rvec, const bool &isMatrixAtom
     vec3 forceFromBox = zeros<vec>(3);
     double dr2, dr6, scalarForce;
 
-    const linkedList<Atom*>* runner = &atomList;
-
-    while (runner->readNext() != 0)
+    for (auto it = atomList.begin(); it != atomList.end(); ++it)
     {
-        if (isMatrixAtom && runner->readItem()->isMatrixAtom()) continue;
+        if (isMatrixAtom && (*it)->isMatrixAtom()) continue;
 
-        drvec = rvec - runner->readItem()->getPosition();
-
-//        ////
-//        if (norm(drvec,2) < 0.01)
-//            cout << "! drvec == 0" << endl;
-//        ////
+        drvec = rvec - (*it)->getPosition();
 
         dr2 = drvec(0)*drvec(0) + drvec(1)*drvec(1) + drvec(2)*drvec(2);
         dr6 = dr2*dr2*dr2;
@@ -229,37 +198,29 @@ const vec3 Box::calculateForceFromBox(const vec3 &rvec, const bool &isMatrixAtom
         forceFromBox(1) += forceFromAtom(1);
         forceFromBox(2) += forceFromAtom(2);
 
-        runner->readItem()->addToForce(-forceFromAtom);
-
-        runner = runner->readNext();
+        (*it)->addToForce(-forceFromAtom);
     }
 
     return forceFromBox;
 }
 
-const vec3 Box::calculateForceFromSelf(const linkedList<Atom*>* runner)
+//const vec3 Box::calculateForceFromSelf(const linkedList<Atom*>* runner) // MAKE COPY OF ITERATOR
+const vec3 Box::calculateForceFromSelf(std::vector<Atom*>::iterator it, std::vector<Atom*>::iterator &end) // MAKE COPY OF ITERATOR
 {
     /* Calculates the force on at atom inside *this, from all other atoms inside
      * the box, except the ones that are before it in the list of atoms. We skip
-     * the first part of the list with N2L.
-     * "runner" will be a copy of the linked list we input to the function, so
-     * we can operate freely on it (it's const anyway though...) */
+     * the first part of the list with N2L. */
 
     vec3 drvec, forceFromAtom;
     vec3 forceFromSelf = zeros<vec>(3);
     double scalarForce, dr2, dr6;
 
-    const vec3 rvec = runner->readItem()->getPosition();
-    runner = runner->readNext(); // don't want to calculate force between the same atom
+    const vec3 rvec = (*it)->getPosition();
+    ++it; // don't want to calculate force between the same atom
 
-    while (runner->readNext() != 0)
+    for (; it != end; ++it)
     {
-        drvec = rvec - runner->readItem()->getPosition();
-
-//        ////
-//        if (norm(drvec,2) < 0.01)
-//            cout << "! drvec == 0" << endl;
-//        ////
+        drvec = rvec - (*it)->getPosition();
 
         dr2 = drvec(0)*drvec(0) + drvec(1)*drvec(1) + drvec(2)*drvec(2);
         dr6 = dr2*dr2*dr2;
@@ -273,9 +234,7 @@ const vec3 Box::calculateForceFromSelf(const linkedList<Atom*>* runner)
         forceFromSelf(1) += forceFromAtom(1);
         forceFromSelf(2) += forceFromAtom(2);
 
-        runner->readItem()->addToForce(-forceFromAtom);
-
-        runner = runner->readNext();
+        (*it)->addToForce(-forceFromAtom);
     }
 
     return forceFromSelf;
