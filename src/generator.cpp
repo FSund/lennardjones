@@ -107,6 +107,11 @@ void Generator::randomSphericalPores(
         double poreRadiusMean,
         double poreRadiusStddv)
 {
+    /* Generates random pores of matrix (solid atoms), with normally distributed
+     * radius around poreRadiusMean, with standard deviation poreRadiusStddv.
+     * Use invertMatrix() after if you want the matrix to be the stuff outside
+     * the pores */
+
     const vec3 systemSize = state->size;
     mat centers = randn<mat>(3, nPores);
     for (uint i = 0; i < 3; i++)
