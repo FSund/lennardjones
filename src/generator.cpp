@@ -58,6 +58,7 @@ State Generator::createCrystal(
 
     vec3 systemSize = nUnitCellsVec%unitCellSize;
     State state(atoms, systemSize, interactionLength);
+
     return state;
 }
 
@@ -97,6 +98,74 @@ void Generator::setTemperature(
     for (uint i = 0; i < nAtoms; i++)
     {
         state->atoms[i]->setVelocity(velocities.col(i));
+    }
+}
+
+void Generator::randomSphericalPores(
+        State* state,
+        uint nPores,
+        double poreRadiusMean,
+        double poreRadiusStddv)
+{
+    const vec3 systemSize = state->size;
+    mat centers = randn<mat>(3, nPores);
+    for (uint i = 0; i < 3; i++)
+        centers.col(i) = centers.col(i)%systemSize;
+    vec radii = randu<vec>(nPores)*poreRadiusStddv + poreRadiusMean;
+
+    // PBC
+    int ii = 0;
+    mat displacementMat(3,27);
+    vec3 displacement;
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            for (int k = -1; k <= 1; k++)
+            {
+                displacement << i*systemSize(0) << endr
+                             << j*systemSize(1) << endr
+                             << k*systemSize(2);
+                displacementMat.col(ii) = displacement;
+                ii++;
+            }
+        }
+    }
+
+    uint nAtoms = state->getnAtoms();
+    vec3 pos, rvec;
+    vec3 center;
+    double dr;
+    Atom* atom;
+    for (uint poreNr = 0; poreNr < nPores; poreNr++)
+    {
+        center = centers.col(poreNr);
+        for (uint i = 0; i < nAtoms; i++)
+        {
+            atom = state->atoms[i];
+            pos = atom->getPosition();
+            for (uint j = 0; j < 27; j++)
+            {
+                rvec = pos - center + displacementMat.col(j);
+                dr = norm(rvec, 2);
+                if (dr <= radii(poreNr))
+                {
+                    atom->setMatrixAtom();
+                    break; // don't need to check the rest of the pores against this atom
+                }
+            }
+        }
+    }
+}
+
+void Generator::invertMatrix(State *state)
+{
+    for (Atom* atom : state->atoms)
+    {
+        if (atom->isMatrixAtom())
+            atom->setMovingAtom();
+        else
+            atom->setMatrixAtom();
     }
 }
 
@@ -234,4 +303,3 @@ void Generator::saveStateBox(State *state, const string &filename)
 
     ofile.close();
 }
-
