@@ -2,8 +2,9 @@
 #define STATE_H
 
 // forward declarations
-class Integrator;
 class Generator;
+class Integrator;
+class Processor;
 
 #include <armadillo>
 
@@ -16,8 +17,9 @@ using namespace arma;
 
 class State
 {
-friend class Integrator;
 friend class Generator;
+friend class Integrator;
+friend class Processor;
 
 public:
     State();

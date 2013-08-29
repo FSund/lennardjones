@@ -1,6 +1,8 @@
 #include <src/mainapplication.h>
 
-MainApplication::MainApplication()
+MainApplication::MainApplication(uint myRank, uint nProcs):
+    myRank(myRank),
+    nProcs(nProcs)
 {
 }
 

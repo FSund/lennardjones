@@ -13,9 +13,13 @@ using namespace arma;
 class MainApplication
 {
 public:
-    MainApplication();
+    MainApplication(uint myRank, uint nProcs);
     int run(int argc, char *argv[]);
     int benchmark(int argc, char *argv[]);
+
+protected:
+    uint myRank;
+    uint nProcs;
 };
 
 #endif // MAINAPPLICATION_H

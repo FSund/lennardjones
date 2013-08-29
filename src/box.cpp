@@ -84,16 +84,6 @@ void Box::findNeighbours(const vec3 systemSize, const vector<Box*> boxes)
             }
         }
     }
-
-//    ////
-//    cout << displacementVectors << endl;
-//    cout << "We found " << nNeighbours << "/" << neighbours.size() << " neighbours." << endl;
-//    cout << endl;
-//    cout << "the neighbours of box #" << sub2ind3d(index, nBoxesVec) << " are " << endl;
-//    for (Box* box : neighbours)
-//        cout << sub2ind3d(box->index, nBoxesVec) << endl;
-//    cout << endl;
-//    ////
 }
 
 void Box::addAtom(Atom* atom)
@@ -212,11 +202,6 @@ const vec3 Box::calculateForceFromBox(const vec3 &rvec, const bool &isMatrixAtom
 
         drvec = rvec - runner->readItem()->getPosition();
 
-//        ////
-//        if (norm(drvec,2) < 0.01)
-//            cout << "! drvec == 0" << endl;
-//        ////
-
         dr2 = drvec(0)*drvec(0) + drvec(1)*drvec(1) + drvec(2)*drvec(2);
         dr6 = dr2*dr2*dr2;
         scalarForce = 24.0*(2.0 - dr6)/(dr6*dr6*dr2);
@@ -255,11 +240,6 @@ const vec3 Box::calculateForceFromSelf(const linkedList<Atom*>* runner)
     while (runner->readNext() != 0)
     {
         drvec = rvec - runner->readItem()->getPosition();
-
-//        ////
-//        if (norm(drvec,2) < 0.01)
-//            cout << "! drvec == 0" << endl;
-//        ////
 
         dr2 = drvec(0)*drvec(0) + drvec(1)*drvec(1) + drvec(2)*drvec(2);
         dr6 = dr2*dr2*dr2;
