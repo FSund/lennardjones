@@ -1,0 +1,37 @@
+atom:
+-position, velocity and force
+
+state:
+-vector of pointers to boxes
+ -boxes constructed in state
+-nBoxes
+
+-vector of pointers to atoms (boxes has pointers to atoms)
+ -atoms constructed outside of state???
+-vector of moving atoms
+-nAtoms, nMovingAtoms, nMatrixAtoms
+
+-size of system
+-size of boxes (same for all boxes)
+
+-function for adding/removing atom
+ -adding atom to the correct box
+  -update nAtoms in box
+ -update nAtoms etc
+
+box:
+-add/remove atom
+-purge - remove atoms that are outside the box
+ -return list of atoms that have left box
+
+integrator:
+-calculates forces, new velocities and positions, using chosen scheme
+
+initializer/state manipulator
+-load/save .xyz file
+-generate initial state from parameters
+-thermostat? (maybe separate class???)
+-generate pores
+-reduce density
+
+

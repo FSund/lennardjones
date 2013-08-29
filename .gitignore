@@ -14,3 +14,4 @@
 
 # Qt Creator stuff
 *.pro.user*
+*.autosave
