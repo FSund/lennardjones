@@ -1,6 +1,8 @@
 #ifndef MAINAPPLICATION_H
 #define MAINAPPLICATION_H
 
+#include <iomanip> // setfill, setw
+
 #include <armadillo>
 
 #include <src/state.h>
